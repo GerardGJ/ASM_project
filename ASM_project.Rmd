@@ -1,0 +1,89 @@
+---
+title: "ASM_project"
+author: "Biel and Gerard"
+date: "2023-12-21"
+output: html_document
+---
+
+For this project we have decided to use the eurodol dataset. 
+
+```{r}
+serie=ts((read.table("Time Series Repository-20231107/eurodol.dat")),start=1995,freq=12)
+plot(serie)
+title("EURODOL")
+abline(v=1995:2020,col=4,lty=3)
+```
+
+## Identification 
+
+For this fist part of the project we are first going to the time series stationary, and then will analyse the ACF and PACF plot to identify the plausible models. 
+
+The first step will be to see if the variance is constant:
+```{r}
+par(mfrow =c(1,2))
+plot(serie)
+title("EURODOL")
+abline(v=1995:2020,col=4,lty=3)
+plot(log(serie))
+title("EURODOL")
+abline(v=1995:2020,col=4,lty=3)
+```
+
+```{r}
+par(mfrow =c(1,2))
+boxplot(serie~floor(time(serie)))
+title("EURODOL")
+
+boxplot(log(serie)~floor(time(serie)))
+title("EURODOL")
+```
+
+```{r}
+m<-apply(matrix(serie,nrow=12),2,mean)
+v<-apply(matrix(serie,nrow=12),2,var)
+plot(v~m)
+```
+  
+Looking at the different plots, we an see that the variance is already constant. This is clearly seen in the mean vs variance plot, we can see that for all means the variance is between 0 and 0.004. So there is no need to change the scale of the data in order to make variance constant, as it already is.
+
+The next step it is to look for the seasonal difference. As we have monthly data if there is a seasonality we will find it every 12 observations.Our first step in order to identify the seasonality will be to plot the month plot.
+
+```{r}
+monthplot(serie)
+```
+  
+At fist glance, from the month plot we can conclude that there is no seasonality, as the mean stays more or less constant all through the months. 
+ 
+
+```{r}
+ts.plot(matrix(serie,nrow=12),col=1:8)
+```
+Looking at this this plot, we can again clearly see that there is no seasonality as all the lines are crossing each other, and they are not following any pattern.
+
+The next step is the constant mean:
+
+```{r}
+d1serie <- diff(serie)
+plot(d1serie)
+abline(h=0)
+```
+```{r}
+d1d1serie <- diff(d1serie)
+plot(d1d1serie)
+abline(h=0)
+```
+
+```{r}
+var(d1serie)
+var(d1d1serie) 
+```
+We can see that having two differenciations increases the variance, so the lowest variance is achieved after one differentiation on the series.
+
+The next step is to analyse the ACF and PACF plots to determine which could be the plausible plots:
+```{r}
+par(mfrow=c(1,2))
+acf(d1serie)
+pacf(d1serie)
+```
+Some plausible models could be MA(1), AR(1), and also we could consider an ARMA(1,1)
+
