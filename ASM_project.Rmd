@@ -223,6 +223,9 @@ validation=function(model,dades){
        type="h", xlab="Lag", ylab="", main="PACF Teoric")
   abline(h=0)
   par(mfrow=c(1,1))
+  
+  suppressMessages(require(forecast,quietly=TRUE,warn.conflicts=FALSE))
+  plot(model)
 }
 ```
 ### Model 1 validation:
